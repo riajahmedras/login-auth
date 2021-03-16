@@ -60,18 +60,18 @@ const handleSignOut = () => {
   });
 }
 const handleBlur = (e) => {
-  let isFormValid = true;
+  let isFieldValid = true;
   if(e.target.name === 'email'){
     const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
-    isFormValid = isEmailValid;
+    isFieldValid = isEmailValid;
 
   }
   if(e.target.name === 'password'){
     const isPasswordValid = e.target.value.length > 6;
     const passwordHasNumber = /\d/.test(e.target.value);
-    isFormValid = isPasswordValid && passwordHasNumber;
+    isFieldValid = isPasswordValid && passwordHasNumber;
   }
-  if(isFormValid){
+  if(isFieldValid){
     // [...cart, newItem]
     const newUserInfo = {...user};
     newUserInfo[e.target.name] = e.target.value;
@@ -79,8 +79,24 @@ const handleBlur = (e) => {
   }
 }
 
-const handleSubmit = () => {
-
+const handleSubmit = (e) => {
+  console.log(user.email, user.password)
+  if(user.email && user.password){
+    firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+  .then((userCredential) => {
+    // Signed in 
+    var user = userCredential.user;
+    console.log(user);
+    // ...
+  })
+  .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    console.log(errorCode, errorMessage);
+    // ..
+  });
+  }
+  e.preventDefault();
 }
 
   return (
@@ -98,15 +114,12 @@ const handleSubmit = () => {
         </div>
       }
       <h2>Authentication</h2>
-        <p>Name: {user.name}</p>
-        <p>Email: {user.email}</p>
-        <p>Password: {user.password}</p>
 
-      <form action="" onClick={handleSubmit}>
+      <field action="" onClick={handleSubmit}>
         <input type="text" placeholder="Your name" name="name" onBlur={handleBlur}/> <br/>
         <input onBlur={handleBlur} type="email" name="email" id="" placeholder="Enter Your Email"/> <br/>
         <input onBlur={handleBlur} type="password" name="password" id="" placeholder="Enter Your Password"/>
-      </form>
+      </field>
 
     </div>
   ); 
